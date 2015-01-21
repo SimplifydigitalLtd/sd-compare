@@ -3,6 +3,8 @@ package org.elasticsearch.plugin.sdscore;
 import org.apache.lucene.search.Explanation;
 import org.elasticsearch.index.fielddata.ScriptDocValues;
 import org.elasticsearch.plugins.AbstractPlugin;
+import org.elasticsearch.rest.RestModule;
+import org.elasticsearch.rest.action.compare.RestCompareAction;
 import org.elasticsearch.script.*;
 
 import java.util.Map;
@@ -19,31 +21,13 @@ public class SdScorePlugin extends AbstractPlugin {
 
 
 
-    public void onModule(ScriptModule module) {
+    public void onModule(RestModule module) {
        System.out.println("Hit onload");
-        module.registerScript("sd-score-plugin", SDExplainFactory.class);
+       module.addRestAction(RestCompareAction.class);
 
            }
 
-    static class SDExplainFactory implements NativeScriptFactory{
 
-        @Override
-        public ExecutableScript newScript(Map<String, Object> map) {
-            return new SDExplainer();
-        }
-    }
 
-    static class SDExplainer extends AbstractDoubleSearchScript implements ExplainableSearchScript{
 
-        @Override
-        public Explanation explain(Explanation explanation) {
-           System.out.println("we hit it");
-            return new Explanation((float) (runAsDouble()), "This script returned " + runAsDouble() + ". _score was: " + score() + " but did not use that.");
-        }
-
-        @Override
-        public double runAsDouble() {
-            return ((Number) ((ScriptDocValues) doc().get("number_field")).getValues().get(0)).doubleValue();
-        }
-    }
 }
