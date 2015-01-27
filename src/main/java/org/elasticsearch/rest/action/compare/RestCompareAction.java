@@ -38,7 +38,9 @@ public class RestCompareAction extends BaseRestHandler {
     @Override
     protected void handleRequest(RestRequest restRequest, RestChannel restChannel, Client client) throws Exception {
         SearchRequest searchRequest;
+
         searchRequest = RestSearchAction.parseSearchRequest(restRequest);
+
         searchRequest.listenerThreaded(false);
         client.search(searchRequest, new CompareFormatterListener(restChannel));
     }
